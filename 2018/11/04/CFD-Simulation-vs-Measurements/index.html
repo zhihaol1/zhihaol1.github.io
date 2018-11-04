@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-icon.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Extract temperature from the Sounding dataset Fit the wind data Check time series Compare the results window.PLOTLYENV=window.PLOTLYENV || {};window.PLOTLYENV.BASE_URL=&quot;https://plot.ly&quot;;Plotly.newPlot">
+<meta name="keywords" content="time series,error bar,Sounding data,CFD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CFD Simulation vs Measurements">
+<meta property="og:url" content="https://zhihaol1.github.io/2018/11/04/CFD-Simulation-vs-Measurements/index.html">
+<meta property="og:site_name" content="CFD Modeling and Visualization">
+<meta property="og:description" content="Extract temperature from the Sounding dataset Fit the wind data Check time series Compare the results window.PLOTLYENV=window.PLOTLYENV || {};window.PLOTLYENV.BASE_URL=&quot;https://plot.ly&quot;;Plotly.newPlot">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://zhihaol1.github.io/images/20181104/20180805_00Zulu_T_Sounding.png">
+<meta property="og:image" content="https://zhihaol1.github.io/images/20181104/20180805_00Zulu_neutralCurveFittingSounding_Speed_Mitchell_Liberty.png">
+<meta property="og:image" content="https://zhihaol1.github.io/images/20181104/20180805_00Zulu_1H_Ave_Met_Error_All.png">
+<meta property="og:updated_time" content="2018-11-04T19:41:12.411Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CFD Simulation vs Measurements">
+<meta name="twitter:description" content="Extract temperature from the Sounding dataset Fit the wind data Check time series Compare the results window.PLOTLYENV=window.PLOTLYENV || {};window.PLOTLYENV.BASE_URL=&quot;https://plot.ly&quot;;Plotly.newPlot">
+<meta name="twitter:image" content="https://zhihaol1.github.io/images/20181104/20180805_00Zulu_T_Sounding.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zhihaol1.github.io/2018/11/04/CFD-Simulation-vs-Measurements/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>CFD Simulation vs Measurements | CFD Modeling and Visualization</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CFD Modeling and Visualization</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br>About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhihaol1.github.io/2018/11/04/CFD-Simulation-vs-Measurements/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zhihao Li">
+      <meta itemprop="description" content="CFD, OpenFOAM, C++, Python">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CFD Modeling and Visualization">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CFD Simulation vs Measurements
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-11-04 14:25:32 / Modified: 14:41:12" itemprop="dateCreated datePublished" datetime="2018-11-04T14:25:32-05:00">2018-11-04</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/11/04/CFD-Simulation-vs-Measurements/#comments" itemprop="discussionUrl">
+                
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/11/04/CFD-Simulation-vs-Measurements/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Extract-temperature-from-the-Sounding-dataset"><a href="#Extract-temperature-from-the-Sounding-dataset" class="headerlink" title="Extract temperature from the Sounding dataset"></a>Extract temperature from the Sounding dataset</h1><p><img src="/images/20181104/20180805_00Zulu_T_Sounding.png" width="500" height="100" alt="[alternative_text]" title="20180805_00Zulu_T_Sounding"></p>
+<h1 id="Fit-the-wind-data"><a href="#Fit-the-wind-data" class="headerlink" title="Fit the wind data"></a>Fit the wind data</h1><p><img src="/images/20181104/20180805_00Zulu_neutralCurveFittingSounding_Speed_Mitchell_Liberty.png" width="500" height="100" alt="[alternative_text]" title="20180805_00Zulu_neutralCurveFittingSounding_Speed_Mitchell_Liberty"></p>
+<h1 id="Check-time-series"><a href="#Check-time-series" class="headerlink" title="Check time series"></a>Check time series</h1><p><img src="/images/20181104/20180805_00Zulu_1H_Ave_Met_Error_All.png" width="500" height="100" alt="[alternative_text]" title="20180805_00Zulu_1H_Ave_Met_Error_All"></p>
+<h1 id="Compare-the-results"><a href="#Compare-the-results" class="headerlink" title="Compare the results"></a>Compare the results</h1><script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<div id="d62b71aa-2b69-42af-ae61-982a197e0ba3" style="height: 100%; width: 100%;" class="plotly-graph-div"></div><script type="text/javascript">window.PLOTLYENV=window.PLOTLYENV || {};window.PLOTLYENV.BASE_URL="https://plot.ly";Plotly.newPlot("d62b71aa-2b69-42af-ae61-982a197e0ba3", [{"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(31, 119, 180, 0.3)", "jitter": 0.5, "legendgroup": "KAGC", "line": {"color": "rgb(31, 119, 180)", "width": 2}, "marker": {"size": 3}, "name": "KAGC", "whiskerwidth": 0.2, "y": [3.6, 3.09, 3.09, 2.06, 4.12, 4.12, 3.6, 4.12, 3.09, 3.6, 3.6, 3.6, 3.6], "type": "box", "uid": "f0748624-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(255, 127, 14, 0.3)", "jitter": 0.5, "legendgroup": "Liberty", "line": {"color": "rgb(255, 127, 14)", "width": 2}, "marker": {"size": 3}, "name": "Liberty", "whiskerwidth": 0.2, "y": [2.68224], "type": "box", "uid": "f074be8c-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(44, 160, 44, 0.3)", "jitter": 0.5, "legendgroup": "Mitchell", "line": {"color": "rgb(44, 160, 44)", "width": 2}, "marker": {"size": 3}, "name": "Mitchell", "whiskerwidth": 0.2, "y": [0.976375, 1.158208, 1.022, 1.312292, 1.064, 1.194375, 0.996917, 1.177417, 1.46125, 1.097708, 1.136083, 0.952708, 0.9975, 1.055875, 0.882083, 0.883917, 0.834917, 0.67075, 0.690917, 0.930708, 0.978875, 1.059958, 1.200958, 0.969375, 0.9345829999999999, 0.831458, 1.087875, 0.978833, 0.8385, 0.718292, 0.730583, 0.7485, 0.839708, 0.820167, 1.116375, 1.028042, 0.870667, 0.741375, 1.063542, 1.070583, 0.706375, 1.0200420000000001, 1.0385, 0.74, 0.907012, 0.779667, 0.684542, 1.039833, 0.70975, 0.924292, 0.747292, 0.802125, 1.061292, 0.883583, 1.552083, 1.023208, 0.9892920000000001, 0.723083, 0.623042, 0.729083], "type": "box", "uid": "f075041e-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(214, 39, 40, 0.3)", "jitter": 0.5, "legendgroup": "Lincoln", "line": {"color": "rgb(214, 39, 40)", "width": 2}, "marker": {"size": 3}, "name": "Lincoln", "whiskerwidth": 0.2, "y": [0.6275, 0.742083, 0.53875, 0.52375, 0.46208299999999997, 0.875833, 0.65625, 0.56375, 0.542083, 0.365417, 0.5025, 0.497083, 0.2175, 0.295833, 0.594167, 0.78875, 0.505417, 0.281667, 0.314583, 0.400833, 0.20375, 0.153333, 0.54875, 0.70375, 1.21625, 0.605417, 0.244167, 0.589583, 0.290833, 0.553333, 0.470833, 0.613333, 0.765, 0.4675, 0.572083, 0.625417, 0.565833, 0.564583, 0.408333, 0.475, 0.272083, 0.310417, 0.630833, 0.41625, 0.307083, 0.377083, 0.55875, 0.225417, 0.414583, 0.190833, 0.385833, 0.6075, 0.563333, 0.648333, 0.414583, 0.722083, 1.447917, 0.707083, 0.886667, 0.484167], "type": "box", "uid": "f075334e-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(148, 103, 189, 0.3)", "jitter": 0.5, "legendgroup": "Glassport", "line": {"color": "rgb(148, 103, 189)", "width": 2}, "marker": {"size": 3}, "name": "Glassport", "whiskerwidth": 0.2, "y": [0.5775, 0.558333, 0.70875, 0.356667, 0.58375, 0.6591670000000001, 0.8154170000000001, 0.6375, 0.424167, 0.648117, 0.666667, 0.965, 0.94625, 0.245833, 0.54875, 0.3775, 0.364583, 0.35, 0.31, 0.681667, 0.6125, 0.740167, 0.719167, 0.865, 0.590417, 0.800833, 0.5725, 0.707083, 0.764167, 0.360833, 0.3225, 0.9925, 0.43583299999999997, 0.40920500000000004, 0.4875, 0.47125, 0.4075, 0.406667, 0.43916700000000003, 0.56375, 0.34125, 0.610833, 0.262083, 0.7075, 0.34, 0.559833, 0.227917, 0.632917, 0.24625, 0.472083, 0.432083, 0.465, 0.2325, 0.544167, 0.41125, 0.20916700000000002, 0.546667, 0.642678, 0.457917, 0.242917], "type": "box", "uid": "f0756558-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(140, 86, 75, 0.3)", "jitter": 0.5, "legendgroup": "VFW", "line": {"color": "rgb(140, 86, 75)", "width": 2}, "marker": {"size": 3}, "name": "VFW", "whiskerwidth": 0.2, "y": [1.067917, 0.9404170000000001, 1.186667, 1.154583, 1.175833, 1.123333, 1.006667, 1.00125, 1.104167, 0.795833, 1.24875, 0.794583, 1.069583, 1.098333, 0.989167, 1.035833, 1.042083, 1.078333, 0.824583, 1.090833, 0.888333, 0.73625, 0.852917, 1.1245829999999999, 0.992917, 0.893333, 1.077083, 0.902083, 0.91125, 1.064167, 0.99125, 0.906667, 0.925417, 0.9725, 0.973333, 0.894167, 1.036667, 0.80125, 1.007917, 0.9075, 0.964583, 0.825833, 1.071667, 0.847083, 1.082917, 0.8225, 1.046667, 0.854167, 0.97375, 0.875417, 0.927083, 0.808714, 0.884583, 0.9075, 0.828333, 1.055833, 0.904583, 0.889167, 0.944583, 0.796667], "type": "box", "uid": "f0759834-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(227, 119, 194, 0.3)", "jitter": 0.5, "legendgroup": "LincolnPD", "line": {"color": "rgb(227, 119, 194)", "width": 2}, "marker": {"size": 3}, "name": "LincolnPD", "whiskerwidth": 0.2, "y": [0.436667, 0.94575, 0.266583, 0.373208, 0.1785, 0.256375, 0.493237, 0.611375, 0.60375, 0.549125, 0.44875, 0.644167, 0.722375, 0.297667, 0.34625, 0.5069170000000001, 0.635792, 0.449417, 0.578625, 0.64175, 1.148333, 0.569667, 0.583708, 0.849583, 0.675333, 0.692333, 0.613333, 0.4165, 0.869792, 0.971958, 0.4615, 0.543125, 0.5517920000000001, 0.407542, 0.839125, 0.377292, 0.573542, 0.706125, 0.40075, 0.34575, 0.898917, 0.534357, 0.55125, 0.395917, 0.364417, 0.278458, 0.72, 0.415958, 0.322833, 0.923708, 0.6165, 0.706875, 1.060333, 0.662375, 0.261042, 0.301625, 0.156125, 0.275, 0.408708, 0.6285], "type": "box", "uid": "f075c7e6-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["Liberty"], "y": [2.3], "type": "scatter", "uid": "f07bf4e0-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["Mitchell"], "y": [1.1], "type": "scatter", "uid": "f07c5034-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["Lincoln"], "y": [2.1], "type": "scatter", "uid": "f07cab60-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["Glassport"], "y": [1.1], "type": "scatter", "uid": "f07d05b0-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["VFW"], "y": [0.8], "type": "scatter", "uid": "f07d65f0-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": true, "x": ["LincolnPD"], "y": [2.0], "type": "scatter", "uid": "f07dc536-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(31, 119, 180, 0.3)", "jitter": 0.5, "legendgroup": "KAGC", "line": {"color": "rgb(31, 119, 180)", "width": 2}, "marker": {"size": 3}, "name": "KAGC", "showlegend": false, "whiskerwidth": 0.2, "y": [200.0, 190.0, 200.0, 210.0, 210.0, 220.0, 220.0, 210.0, 220.0, 210.0, 200.0, 200.0, 210.0], "type": "box", "uid": "f07f2ac0-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(255, 127, 14, 0.3)", "jitter": 0.5, "legendgroup": "Liberty", "line": {"color": "rgb(255, 127, 14)", "width": 2}, "marker": {"size": 3}, "name": "Liberty", "showlegend": false, "whiskerwidth": 0.2, "y": [225.0], "type": "box", "uid": "f07f5a04-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(44, 160, 44, 0.3)", "jitter": 0.5, "legendgroup": "Mitchell", "line": {"color": "rgb(44, 160, 44)", "width": 2}, "marker": {"size": 3}, "name": "Mitchell", "showlegend": false, "whiskerwidth": 0.2, "y": [231.18875, 222.7025, 210.730417, 232.813333, 230.961667, 212.126667, 197.1575, 241.585833, 241.35916699999999, 208.73333300000002, 242.124583, 227.60916699999999, 210.559167, 206.4075, 229.880833, 246.60916699999999, 247.159167, 250.25375, 236.38, 222.66, 203.659167, 229.090417, 220.930833, 234.692083, 202.28875, 243.552083, 204.19125, 255.217917, 253.14125, 247.88, 234.10375, 238.255833, 210.25875, 212.07583300000002, 237.666667, 207.5725, 220.215833, 228.000417, 249.869167, 228.805417, 236.9225, 214.58416699999998, 215.66625, 229.82125, 226.29211600000002, 213.000833, 235.160417, 230.3425, 228.7125, 218.70375, 232.41833300000002, 223.904167, 207.9775, 232.70666699999998, 211.26333300000002, 204.95083300000002, 233.095417, 214.633333, 219.122917, 204.83166699999998], "type": "box", "uid": "f07f8952-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(214, 39, 40, 0.3)", "jitter": 0.5, "legendgroup": "Lincoln", "line": {"color": "rgb(214, 39, 40)", "width": 2}, "marker": {"size": 3}, "name": "Lincoln", "showlegend": false, "whiskerwidth": 0.2, "y": [209.975, 196.5625, 138.70416699999998, 268.975, 169.75, 185.5625, 151.845833, 170.175, 121.425, 145.979167, 208.904167, 283.9375, 91.958333, 112.808333, 164.2625, 163.8, 168.175, 111.15, 91.616667, 112.09583300000001, 142.445833, 126.49166699999999, 110.63333300000001, 145.625, 159.8375, 148.20416699999996, 117.066667, 164.29583300000004, 134.025, 136.279167, 135.716667, 114.183333, 144.245833, 133.491667, 121.21666699999999, 121.13333300000001, 141.958333, 170.354167, 203.433333, 94.454167, 55.65, 80.095833, 177.04583300000004, 167.73333300000004, 115.63333300000001, 100.0375, 154.025, 184.316667, 185.54583300000002, 124.683333, 126.975, 166.695833, 178.35833300000004, 165.725, 148.9625, 147.8, 216.245833, 123.625, 155.816667, 147.225], "type": "box", "uid": "f07fd0a6-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(148, 103, 189, 0.3)", "jitter": 0.5, "legendgroup": "Glassport", "line": {"color": "rgb(148, 103, 189)", "width": 2}, "marker": {"size": 3}, "name": "Glassport", "showlegend": false, "whiskerwidth": 0.2, "y": [166.716667, 173.48333300000004, 165.566667, 184.595833, 169.070833, 184.025, 152.508333, 192.520833, 167.433333, 173.322176, 168.629167, 179.42083300000004, 171.425, 188.55, 205.395833, 179.304167, 191.425, 226.20416699999998, 159.89166699999996, 182.445833, 182.9, 183.933054, 169.26666699999996, 164.729167, 172.9625, 174.85833300000004, 155.8375, 162.6125, 127.475, 164.129167, 138.025, 175.475, 155.116667, 192.828452, 135.475, 152.04583300000004, 201.966667, 203.725, 212.408333, 165.64166699999996, 127.75, 160.89166699999996, 189.995833, 173.258333, 231.179167, 189.058577, 228.9875, 145.041667, 159.208333, 167.054167, 212.804167, 150.595833, 191.48333300000002, 156.6375, 142.345833, 199.883333, 136.320833, 137.866109, 147.379167, 181.820833], "type": "box", "uid": "f0800076-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(140, 86, 75, 0.3)", "jitter": 0.5, "legendgroup": "VFW", "line": {"color": "rgb(140, 86, 75)", "width": 2}, "marker": {"size": 3}, "name": "VFW", "showlegend": false, "whiskerwidth": 0.2, "y": [236.104167, 229.45416699999998, 230.07916699999998, 231.35, 232.025, 233.708333, 237.120833, 234.566667, 229.82916699999998, 232.575, 230.10833300000002, 233.870833, 229.76666699999998, 230.67083300000002, 230.845833, 233.408333, 230.025, 229.55, 235.275, 235.666667, 234.975, 237.054167, 228.23333300000002, 228.04583300000002, 229.354167, 231.825, 232.691667, 232.041667, 232.4625, 230.283333, 232.45416699999998, 233.591667, 235.666667, 232.35833300000002, 236.45, 231.9125, 236.2125, 231.220833, 231.54583300000002, 234.820833, 233.366667, 233.425, 233.070833, 236.1375, 228.825, 237.341667, 236.395833, 234.675, 231.98333300000002, 237.279167, 231.39166699999998, 238.141079, 234.395833, 235.520833, 233.3625, 235.154167, 232.345833, 236.254167, 232.0375, 230.7625], "type": "box", "uid": "f0802e8e-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"boxmean": true, "boxpoints": "all", "fillcolor": "rgba(227, 119, 194, 0.3)", "jitter": 0.5, "legendgroup": "LincolnPD", "line": {"color": "rgb(227, 119, 194)", "width": 2}, "marker": {"size": 3}, "name": "LincolnPD", "showlegend": false, "whiskerwidth": 0.2, "y": [208.750417, 176.650833, 238.027917, 217.4675, 161.594583, 176.534583, 231.070954, 215.287083, 210.93875, 217.165417, 201.79125, 254.544167, 269.16875, 226.995833, 245.13, 176.131667, 179.992083, 172.91, 174.59125, 216.745, 199.725417, 206.094583, 179.399583, 204.085417, 237.538333, 240.67208300000001, 209.24041699999998, 157.657083, 218.259167, 208.212083, 193.8425, 186.07791699999999, 200.839583, 221.129167, 179.583333, 230.665417, 219.2325, 208.428333, 193.905417, 175.26541699999999, 231.60375, 203.691701, 227.275417, 228.59875, 154.36541699999995, 163.252917, 215.06, 178.15125, 177.01, 219.6225, 212.554167, 184.819167, 239.77, 212.9, 161.824167, 175.357917, 138.472083, 130.51666699999998, 151.931667, 135.45333300000001], "type": "box", "uid": "f080652a-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["Liberty"], "y": [220], "type": "scatter", "uid": "f082b924-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["Mitchell"], "y": [222], "type": "scatter", "uid": "f08316a8-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["Lincoln"], "y": [221], "type": "scatter", "uid": "f0837346-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["Glassport"], "y": [195], "type": "scatter", "uid": "f083cf76-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["VFW"], "y": [236], "type": "scatter", "uid": "f0842a8e-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}, {"legendgroup": "CFD", "marker": {"color": "black", "size": 15, "symbol": "star"}, "mode": "markers", "name": "CFD", "showlegend": false, "x": ["LincolnPD"], "y": [228], "type": "scatter", "uid": "f084944c-e05c-11e8-a55b-fbaa48a21a64", "xaxis": "x", "yaxis": "y2"}], {"xaxis": {"anchor": "y2", "domain": [0.0, 1.0], "tickfont": {"size": 20}, "linewidth": 2}, "yaxis": {"anchor": "free", "domain": [0.525, 1.0], "position": 0.0, "titlefont": {"size": 20}, "tickfont": {"size": 20}, "title": "Speed (m/s)", "range": [0, 5.12], "zerolinewidth": 2}, "yaxis2": {"anchor": "x", "domain": [0.0, 0.475], "titlefont": {"size": 20}, "tickfont": {"size": 20}, "title": "Direction (&deg;)"}, "legend": {"font": {"size": 15}}, "titlefont": {"size": 24}, "title": "Wind speed and direction at time: 08/05/2018 00Z"}, {"showLink": false, "linkText": "Export to plot.ly", "modeBarButtonsToRemove": ["sendDataToCloud"]})</script>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/time-series/" rel="tag"># time series</a>
+          
+            <a href="/tags/error-bar/" rel="tag"># error bar</a>
+          
+            <a href="/tags/Sounding-data/" rel="tag"># Sounding data</a>
+          
+            <a href="/tags/CFD/" rel="tag"># CFD</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/25/Meteorology_data_comparison_at_different_locations_092018/" rel="next" title="Meteorology data comparison at different locations (09/2018)">
+                <i class="fa fa-chevron-left"></i> Meteorology data comparison at different locations (09/2018)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Zhihao Li</p>
+              <p class="site-description motion-element" itemprop="description">CFD, OpenFOAM, C++, Python</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/zhihaol1" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.linkedin.com/in/zhihao-li/" target="_blank" title="LinkedIn"><i class="fa fa-fw fa-linkedin"></i>LinkedIn</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Extract-temperature-from-the-Sounding-dataset"><span class="nav-number">1.</span> <span class="nav-text">Extract temperature from the Sounding dataset</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Fit-the-wind-data"><span class="nav-number">2.</span> <span class="nav-text">Fit the wind data</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Check-time-series"><span class="nav-number">3.</span> <span class="nav-text">Check time series</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Compare-the-results"><span class="nav-number">4.</span> <span class="nav-text">Compare the results</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright"> &copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhihao Li</span>
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.4.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+  
+    <script id="dsq-count-scr" src="https://zhihaol1.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://zhihaol1.github.io/2018/11/04/CFD-Simulation-vs-Measurements/';
+        this.page.identifier = '2018/11/04/CFD-Simulation-vs-Measurements/';
+        this.page.title = 'CFD Simulation vs Measurements';
+        };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://zhihaol1.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
